@@ -1,4 +1,13 @@
+using ETrade.API.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD_PROJE1");
+var fullConnectionString= $"{connectionString} Password={dbPassword};";
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(fullConnectionString));
 
 // Add services to the container.
 

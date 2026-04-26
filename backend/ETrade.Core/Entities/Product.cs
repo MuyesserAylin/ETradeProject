@@ -1,5 +1,4 @@
-﻿namespace ETrade.API.Models.Entities
-{
+﻿namespace ETrade.Core.Entities;
     public class Product
     {
         public int Id { get; set; }
@@ -12,11 +11,11 @@
 
         public int CategoryId { get; set; }
         public Category Category { get; set; } = null!;
-        public List<CartItem> CartItems { get; set; } = new();
+    public List<CartItem> CartItems { get; set; } = new();
        
 
 
 
 
     }
-}
+

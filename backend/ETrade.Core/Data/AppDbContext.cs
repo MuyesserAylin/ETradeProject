@@ -1,8 +1,7 @@
-﻿using ETrade.API.Models.Entities;
-using Microsoft.AspNetCore.Authentication;
+﻿using ETrade.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace ETrade.API.Data
+namespace ETrade.Core.Data
 {
     public class AppDbContext:DbContext
     {

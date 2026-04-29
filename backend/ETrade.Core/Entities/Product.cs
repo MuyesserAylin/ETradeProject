@@ -11,7 +11,7 @@
 
         public int CategoryId { get; set; }
         public Category Category { get; set; } = null!;
-    public List<CartItem> CartItems { get; set; } = new();
+        public List<CartItem> CartItems { get; set; } = new();
        
 
 

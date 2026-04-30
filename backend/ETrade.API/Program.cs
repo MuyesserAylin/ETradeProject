@@ -1,10 +1,13 @@
+using ETrade.API.Middlewares;
 using ETrade.Core.Data;
+using ETrade.Core.DTOs.Responses;
 using ETrade.Core.Helpers;
 using ETrade.Core.Repositores.Abstract;
 using ETrade.Core.Repositores.Concrete;
 using ETrade.Core.Services.Abstract;
 using ETrade.Core.Services.Concrete;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -42,6 +45,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddControllers();
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(x => x.Value!.Errors.Count > 0)
+            .ToDictionary(
+                x => x.Key.ToLower(),
+                x => x.Value!.Errors.Select(e => e.ErrorMessage).ToList()
+            );
+
+        var response = ApiResponse<Dictionary<string, List<string>>>
+            .FailResponse("Validation hatasý.", 400);
+        response.Data = errors;
+
+        return new BadRequestObjectResult(response);
+    };
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -53,6 +75,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<GlobalExceptionMiddleware>(); 
 app.UseHttpsRedirection();
 app.UseAuthentication(); 
 app.UseAuthorization();

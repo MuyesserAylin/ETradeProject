@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 
 namespace ETrade.Core.Exceptions
 {
-    internal class BaseException
+    public class BaseException:Exception
     {
+        public  int StatusCode {  get; set; }
+
+        public BaseException(string message,int statusCode):base(message)
+        {
+            StatusCode = statusCode;
+        }
     }
 }

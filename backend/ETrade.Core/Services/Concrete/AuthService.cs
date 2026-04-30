@@ -1,6 +1,7 @@
 ﻿using ETrade.Core.DTOs.Requests;
 using ETrade.Core.DTOs.Responses;
 using ETrade.Core.Entities;
+using ETrade.Core.Exceptions;
 using ETrade.Core.Helpers;
 using ETrade.Core.Repositores.Abstract;
 using ETrade.Core.Services.Abstract;
@@ -30,7 +31,7 @@ namespace ETrade.Core.Services.Concrete
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             {
-                throw new Exception("Email adresiniz veya şifreniz hatalı!");
+                throw new UnauthorizedException("Email adresiniz veya şifreniz hatalı");
             }
             var jwtResult= _jwtHelper.GenerateToken(user);
 
@@ -50,7 +51,7 @@ namespace ETrade.Core.Services.Concrete
         {
             if (await _authRepository.EmailExists(request.Email))
             {
-                throw new Exception("Bu email adresi kullanılmaktadır.");
+                throw new BadRequestException("Bu email adresi kullanılmaktadır.");
             }
 
             var user = new User

@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace ETrade.Core.Exceptions
 {
-    internal class BadRequestException
+    public class BadRequestException:BaseException
     {
+        public BadRequestException(string message):base(message,400)
+        {
+
+        }
     }
 }

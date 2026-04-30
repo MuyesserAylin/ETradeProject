@@ -1,4 +1,5 @@
 ﻿using ETrade.Core.DTOs.Requests;
+using ETrade.Core.DTOs.Responses;
 using ETrade.Core.Services.Abstract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,17 +19,17 @@ namespace ETrade.API.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Login(RegisterRequest request)
+        public async Task<IActionResult> Register(RegisterRequest request)
         {
             var result = await _authService.Register(request);
-            return Ok(result);
+            return StatusCode(201, ApiResponse<Object>.SuccesResponse(null, result, 201));
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequest request)
         {
             var result=await _authService.Login(request);
-            return Ok(result);
+            return Ok(ApiResponse<LoginResponse>.SuccesResponse(result, "Giriş Yapıldı."));
         }
 
     }

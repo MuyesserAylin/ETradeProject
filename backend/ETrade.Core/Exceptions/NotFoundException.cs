@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace ETrade.Core.Exceptions
 {
-    internal class NotFoundException
+    public class NotFoundException:BaseException
     {
+        public NotFoundException(string message):base(message,404)
+        { 
+        }
     }
 }

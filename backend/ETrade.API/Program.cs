@@ -9,6 +9,7 @@ using ETrade.Core.Services.Concrete;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -68,6 +69,25 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+using (var scope=app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    if(!context.Users.Any(u=>u.Role=="Admin"))
+    {
+        context.Users.Add(new ETrade.Core.Entities.User
+        {
+            FullName="Admin",
+            Email = builder.Configuration["AdminSettings:Email"]!,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(builder.Configuration["AdminSettings:Password"]!),
+            Role="Admin"
+            
+        });
+        context.SaveChanges();
+
+    }
+}
 
 if (app.Environment.IsDevelopment())
 {

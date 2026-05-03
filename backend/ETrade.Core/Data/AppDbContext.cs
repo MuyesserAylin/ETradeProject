@@ -20,6 +20,10 @@ namespace ETrade.Core.Data
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
+
+            modelBuilder.Entity<Category>()
+                .HasIndex(c=>c.Name)
+                .IsUnique();
         }
     
     }

@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace ETrade.Core.DTOs.Responses
 {
-    internal class CategoryResponseDto
+    public class CategoryResponseDto
     {
+        public int Id { get; set; }
+        public string Name { get; set; } = null!;
     }
 }

@@ -49,5 +49,23 @@ namespace ETrade.Core.Repositores.Concrete
             await _context.SaveChangesAsync();
             return category;
         }
+
+        public async Task<CategoryDeleteCheckDto?> GetCategoryWithProductStatusAsync(int categoryId)
+        {
+            return await _context.Categories
+                  .Where(c => c.Id == categoryId)
+                  .Select(c => new CategoryDeleteCheckDto
+                  {
+                      Category = new Category { Id=c.Id,Name=c.Name },
+                      HasProducts = c.Products!=null && c.Products.Any()
+                  })
+                  .FirstOrDefaultAsync();
+        }
+
+        public async Task DeleteCategoryAsync(Category category)
+        {
+             _context.Remove(category);
+            await _context.SaveChangesAsync();
+        }
     }
 }

@@ -19,6 +19,8 @@ namespace ETrade.Core.Repositores.Abstract
         public Task<Category?> GetByIdCategoryAsync(int CategoryId);
         public Task<Category?> GetByNameCategoryAsync(string CategoryName);
         public Task<Category> UpdateCategoryAsync(Category category);
+        public Task<CategoryDeleteCheckDto?> GetCategoryWithProductStatusAsync(int CategoryId);
+        public Task DeleteCategoryAsync(Category category);
 
     }
 }

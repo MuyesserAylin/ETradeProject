@@ -15,5 +15,6 @@ namespace ETrade.Core.Services.Abstract
         public Task<CategoryResponseDto> GetByIdCategoryAsync(int categoryId);
 
         public Task<CategoryResponseDto> UpdateCatgeoryAsync(int categoryId, CategoryCreateDto request);
+        public Task DeleteCategoryAsync(int categoryId);
     }
 }

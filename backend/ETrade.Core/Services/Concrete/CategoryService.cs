@@ -35,6 +35,25 @@ namespace ETrade.Core.Services.Concrete
 
         }
 
+        public async Task DeleteCategoryAsync(int categoryId)
+        {
+            var categoryDeleteCheckDto=await _categoryRepository.GetCategoryWithProductStatusAsync(categoryId);
+
+            if (categoryDeleteCheckDto==null)
+            {
+                throw new BadRequestException("Aradığınız kategori mevcut değildir.");
+            }
+
+            if(categoryDeleteCheckDto.HasProducts)
+            {
+                throw new BadRequestException("Silmek istediğiniz kategoriye ait ürünler vardır." +
+                    "Lütfen önce silmek istediğiniz kategoriye ait ürünleri siliniz.");
+            }
+
+            await _categoryRepository.DeleteCategoryAsync(categoryDeleteCheckDto.Category);
+           
+        }
+
         public async  Task<List<CategoryResponseDto>> GetAllCategoriesAsync()
         {
            var categories=await _categoryRepository.GetAllCategoriesAsync();

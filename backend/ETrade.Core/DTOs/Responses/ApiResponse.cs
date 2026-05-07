@@ -24,6 +24,16 @@ namespace ETrade.Core.DTOs.Responses
                 StatusCode = statusCode
             };
         }
+        public static ApiResponse<T> SuccesResponse(string message = "İşlem Başarılı", int statusCode = 200)
+        {
+            return new ApiResponse<T>
+            {
+                Succes = true,
+                Message = message,
+                Data = default, // T neyse onun varsayılanını (null) atar
+                StatusCode = statusCode
+            };
+        }
 
         public static ApiResponse<T> FailResponse(string message,int statusCode=400)
         {

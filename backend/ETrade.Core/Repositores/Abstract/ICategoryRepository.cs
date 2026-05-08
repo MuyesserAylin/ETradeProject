@@ -1,6 +1,6 @@
 ﻿
+using ETrade.Core.DTOs.Internal;
 using ETrade.Core.DTOs.Requests;
-using ETrade.Core.DTOs.Responses;
 using ETrade.Core.Entities;
 using System;
 using System.Collections.Generic;

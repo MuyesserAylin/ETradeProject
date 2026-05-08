@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ETrade.Core.DTOs.Responses
+namespace ETrade.Core.DTOs.Internal
 {
     public class CategoryDeleteCheckDto
     {

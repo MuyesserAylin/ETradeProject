@@ -17,7 +17,7 @@ namespace ETrade.API.Controllers
         public CategoryController(ICategoryService categoryService) { _categoryService = categoryService; }
 
         [HttpPost]
-        public async Task<IActionResult> AddCategoryAsync(CategoryCreateDto request)
+        public async Task<IActionResult> AddCategoryAsync([FromBody]CategoryCreateDto request)
         {
             var result=await _categoryService.AddCategoryAsync(request);
             return StatusCode(201,ApiResponse<CategoryResponseDto>.SuccesResponse(result,"Kategori başarıyla oluşturuldu.",201));
@@ -39,7 +39,7 @@ namespace ETrade.API.Controllers
         }
 
         [HttpPut("{categoryId}")]
-        public async Task<IActionResult> UpdateCategoryAsync(int categoryId,CategoryCreateDto request)
+        public async Task<IActionResult> UpdateCategoryAsync(int categoryId,[FromBody]CategoryCreateDto request)
         {
             var result=await _categoryService.UpdateCatgeoryAsync(categoryId,request);
             return Ok(ApiResponse<CategoryResponseDto>.SuccesResponse(result, "Kategori güncellendi.", 200));

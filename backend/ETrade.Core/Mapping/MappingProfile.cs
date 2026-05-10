@@ -15,10 +15,14 @@ namespace ETrade.Core.Mapping
         public MappingProfile() {
 
             CreateMap<ProductCreateDto, Product>();
+
             CreateMap<Product, ProductResponseDto>()
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name));
-                
-        
+
+            //  CreateMap<Product, ProductDetailResponseDto>()
+            //    .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name));
+            CreateMap<Product, ProductDetailResponseDto>()
+                  .IncludeBase<Product, ProductResponseDto>();
         }
     }
 }

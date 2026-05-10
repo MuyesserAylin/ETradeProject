@@ -1,10 +1,12 @@
 ﻿using ETrade.Core.Data;
+using ETrade.Core.DTOs.Responses;
 using ETrade.Core.Entities;
 using ETrade.Core.Repositores.Abstract;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,6 +25,27 @@ namespace ETrade.Core.Repositores.Concrete
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
             return product;
+        }
+
+        public async Task<List<Product>> GetAllProductsAsync(int? categoryId)
+        {
+            var query =_context.Products
+                .Include(p => p.Category)
+                .Where(p=>!p.IsDeleted)
+                .AsQueryable();
+            if(categoryId.HasValue)
+            {
+                query=query.Where(x=>x.CategoryId == categoryId);
+            }
+            return await query.ToListAsync();
+
+        }
+
+        public async Task<Product?> GetProductByIdAsync(int id)
+        {
+           return await _context.Products
+                .Include(p=>p.Category)
+                .FirstOrDefaultAsync(x=>x.Id==id && !x.IsDeleted);
         }
 
         public async Task<bool> IsExistProductName(string Productname)

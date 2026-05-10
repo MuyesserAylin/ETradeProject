@@ -23,6 +23,21 @@ namespace ETrade.API.Controllers
             return StatusCode(201, ApiResponse<ProductResponseDto>.SuccesResponse(result, "Ürün eklendi", 201));
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetAllProductsAsync([FromQuery] int? categoryId)
+        {
+            var result=await _productService.GetAllProductsAsync(categoryId);
+            return Ok(ApiResponse<List<ProductResponseDto>>.SuccesResponse(result, "Ürünler listelendi", 200));
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProductByIdAsync( int id)
+        {
+            var result = await _productService.GetProductByIdAsync(id);
+            return Ok(ApiResponse<ProductDetailResponseDto>.SuccesResponse(result, "Ürün bilgileri getirildi.", 200));
+        }
 
     }
 }

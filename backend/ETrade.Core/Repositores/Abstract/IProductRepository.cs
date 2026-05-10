@@ -1,4 +1,5 @@
-﻿using ETrade.Core.Entities;
+﻿using ETrade.Core.DTOs.Responses;
+using ETrade.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,10 @@ namespace ETrade.Core.Repositores.Abstract
     {
         public Task<bool> IsExistProductName(string Productname);
         public Task<Product> AddProductAsync(Product product);
+
+        public Task<List<Product>> GetAllProductsAsync(int? categoryId);
+
+        public Task<Product?> GetProductByIdAsync(int id);
 
     }
 }

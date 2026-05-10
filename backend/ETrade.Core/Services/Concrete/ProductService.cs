@@ -31,7 +31,7 @@ namespace ETrade.Core.Services.Concrete
             var category=await _categoryRepository.GetByIdCategoryAsync(request.CategoryId);
            if(category==null)
             {
-                throw new BadRequestException("Eklemek istediğiniz ürünün kategorisi mevcut değildir");
+                throw new NotFoundException("Eklemek istediğiniz ürünün kategorisi mevcut değildir");
 
             }
            if(await _productRepository.IsExistProductName(request.Name))
@@ -45,6 +45,31 @@ namespace ETrade.Core.Services.Concrete
             response.CategoryName= category.Name;
             return response;
 
+        }
+
+        public async Task<List<ProductResponseDto>> GetAllProductsAsync(int? categoryId)
+        {
+            List<Product> products;
+            if(categoryId.HasValue)
+            {
+                var category = await _categoryRepository.GetByIdCategoryAsync(categoryId.Value);
+                if(category == null)
+                {
+                    throw new NotFoundException("Ürünlerini listelemek istediğiniz kategori mevcut değildir");
+                }
+            }
+            products = await _productRepository.GetAllProductsAsync(categoryId);
+            return _mapper.Map<List<ProductResponseDto>>(products);
+        }
+
+        public async Task<ProductDetailResponseDto> GetProductByIdAsync(int id)
+        {
+            var product=await _productRepository.GetProductByIdAsync(id);
+            if(product== null)
+            {
+                throw new NotFoundException("İncelemek istediğiniz ürün mevcut değildir");
+            }
+            return _mapper.Map<ProductDetailResponseDto>(product);
         }
     }
 }

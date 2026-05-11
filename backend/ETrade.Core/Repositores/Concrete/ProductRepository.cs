@@ -52,5 +52,19 @@ namespace ETrade.Core.Repositores.Concrete
         {
             return await _context.Products.AnyAsync(p=>p.Name == Productname);
         }
+
+        public async Task<bool> IsExistProductName(string productName, int id)
+        {
+            return await _context.Products
+                .Where(p=>!p.IsDeleted)
+                .AnyAsync(x=>x.Name == productName && x.Id!=id);
+        }
+
+        public async Task<Product> UpdateProductAsync(Product product)
+        {
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
+            return product;
+        }
     }
 }

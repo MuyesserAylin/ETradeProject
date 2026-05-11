@@ -22,6 +22,11 @@ namespace ETrade.Core.Mapping
   
             CreateMap<Product, ProductDetailResponseDto>()
                   .IncludeBase<Product, ProductResponseDto>();
+
+
+            CreateMap<ProductUpdateDto, Product>();
+
+
         }
     }
 }

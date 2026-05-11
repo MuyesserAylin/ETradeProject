@@ -17,5 +17,9 @@ namespace ETrade.Core.Repositores.Abstract
 
         public Task<Product?> GetProductByIdAsync(int id);
 
+        public Task<bool> IsExistProductName(string productName, int id);
+
+        public Task<Product> UpdateProductAsync(Product product);
+
     }
 }

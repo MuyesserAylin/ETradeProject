@@ -26,6 +26,10 @@ namespace ETrade.Core.Mapping
 
             CreateMap<ProductUpdateDto, Product>();
 
+            CreateMap<AddToCartDto, CartItem>();
+
+            CreateMap<CartItem, CartItemResponseDto>();
+
 
         }
     }

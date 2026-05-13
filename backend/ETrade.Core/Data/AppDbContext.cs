@@ -24,6 +24,9 @@ namespace ETrade.Core.Data
             modelBuilder.Entity<Category>()
                 .HasIndex(c=>c.Name)
                 .IsUnique();
+
+            modelBuilder.Entity<Product>()
+                .HasQueryFilter(p => !p.IsDeleted);
         }
     
     }

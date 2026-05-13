@@ -24,12 +24,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(fullConnectionString));
 
 // Repository ve Service kayýtlar
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IProductRepository, ProductRepository>(); 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICategoryRepository,CategoryRepository>();
 builder.Services.AddScoped<ICategoryService,CategoryService>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<ICartService,CartService>();
+
 builder.Services.AddScoped<JwtHelper>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 

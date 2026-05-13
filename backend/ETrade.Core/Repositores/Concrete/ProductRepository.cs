@@ -31,7 +31,6 @@ namespace ETrade.Core.Repositores.Concrete
         {
             var query =_context.Products
                 .Include(p => p.Category)
-                .Where(p=>!p.IsDeleted)
                 .AsQueryable();
             if(categoryId.HasValue)
             {
@@ -43,9 +42,14 @@ namespace ETrade.Core.Repositores.Concrete
 
         public async Task<Product?> GetProductByIdAsync(int id)
         {
-           return await _context.Products
-                .Include(p=>p.Category)
-                .FirstOrDefaultAsync(x=>x.Id==id && !x.IsDeleted);
+            return await _context.Products
+                 .Include(p => p.Category)
+                 .FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public Task<Product?> GetProductByIdWithoutCategoryAsync(int id)
+        {
+           return _context.Products.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<bool> IsExistProductName(string Productname)
@@ -56,7 +60,6 @@ namespace ETrade.Core.Repositores.Concrete
         public async Task<bool> IsExistProductName(string productName, int id)
         {
             return await _context.Products
-                .Where(p=>!p.IsDeleted)
                 .AnyAsync(x=>x.Name == productName && x.Id!=id);
         }
 

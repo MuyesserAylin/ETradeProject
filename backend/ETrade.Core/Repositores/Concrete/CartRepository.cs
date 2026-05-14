@@ -24,6 +24,21 @@ namespace ETrade.Core.Repositores.Concrete
             return cartItem;
         }
 
+        public async Task<List<CartItem>> GetAllCartItemAsync(int userId)
+        {
+            return await _context.CartItems
+                 .Where(c => c.UserId == userId)
+                 .Include(w => w.Product)
+                 .ToListAsync();
+        }
+
+        public async Task<CartItem?> GetCartItemByIdAsync(int id)
+        {
+           return await _context.CartItems
+                 .Include(w => w.Product)
+                .FirstOrDefaultAsync(c=>c.Id == id);
+        }
+
         public async Task<CartItem?> GetCartItemByUserAndProductAsync(int userId, int productId)
         {
             return await _context.CartItems.FirstOrDefaultAsync(c=>c.UserId == userId && c.ProductId == productId); 

@@ -14,6 +14,7 @@ namespace ETrade.Core.Repositores.Abstract
         public Task<CartItem?> GetCartItemByUserAndProductAsync(int userId, int productId);
         public Task<CartItem> AddCartItemAsync(CartItem cartItem);
         public Task<CartItem> UpdateCartItemAsync(CartItem cartItem);
-
+        public Task<List<CartItem>> GetAllCartItemAsync(int userId);
+        public Task<CartItem?> GetCartItemByIdAsync(int id);
     }
 }

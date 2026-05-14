@@ -25,5 +25,20 @@ namespace ETrade.API.Controllers
             var result = await _cartService.AddToCartAsync(request);
             return StatusCode(201, ApiResponse<CartItemResponseDto>.SuccesResponse(result, "Ürün sepetinize eklendi.", 201));
         }
+
+        [HttpGet]
+        [Authorize(Roles = "Customer")]
+        public async Task<IActionResult> GetCartAsync()
+        {
+            var result = await _cartService.GetCartAsync();
+            return Ok( ApiResponse<CartResponseDto>.SuccesResponse(result, "Sepetiniz görüntüleniyor.", 200));
+        }
+        [HttpPatch("{id}")]
+        [Authorize(Roles = "Customer")]
+        public async Task<IActionResult> UpdateCartItemQuantityAsync(int id, [FromBody]UpdateCartItemDto request)
+        {
+            var result = await _cartService.UpdateCartItemQuantityAsync(id, request);
+            return Ok(ApiResponse<CartItemResponseDto>.SuccesResponse(result, "Seçtiğiniz ürünün miktarı güncellendi.", 200));
+        }
     }
 }

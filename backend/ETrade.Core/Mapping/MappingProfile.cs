@@ -28,7 +28,11 @@ namespace ETrade.Core.Mapping
 
             CreateMap<AddToCartDto, CartItem>();
 
-            CreateMap<CartItem, CartItemResponseDto>();
+
+            CreateMap<CartItem, CartItemResponseDto>()
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product!=null ? src.Product.Name:string.Empty))
+                .ForMember(dest => dest.UnitPrice, opt => opt.MapFrom(src => src.Product!=null ? src.Product.Price :0))
+                 .ForMember(dest=>dest.LinePrice,opt=>opt.MapFrom(src=>src.Product!=null ? src.Product.Price*src.Quantity :0));
 
 
         }

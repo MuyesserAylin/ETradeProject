@@ -11,5 +11,7 @@ namespace ETrade.Core.Services.Abstract
     public interface ICartService
     {
         public Task<CartItemResponseDto> AddToCartAsync(AddToCartDto request);
+        public Task<CartResponseDto> GetCartAsync();
+        public Task<CartItemResponseDto> UpdateCartItemQuantityAsync(int id,UpdateCartItemDto request);
     }
 }

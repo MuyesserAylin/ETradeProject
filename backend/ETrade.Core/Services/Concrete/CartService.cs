@@ -66,11 +66,6 @@ namespace ETrade.Core.Services.Concrete
                        "Lütfen ürün miktarını güncelleyiniz.");
                 }
                 
-                
-                   
-                
-
-               
             }
 
             var response = _mapper.Map<CartItemResponseDto>(cartItem);
@@ -80,6 +75,28 @@ namespace ETrade.Core.Services.Concrete
             return response;
 
 
+        }
+
+        public async Task<CartResponseDto> GetCartAsync()
+        {
+            var cartItems=await _cartRepository.GetAllCartItemAsync(GetUserId());
+            var response=new CartResponseDto();
+            response.CartItems = _mapper.Map<List<CartItemResponseDto>>(cartItems);
+            response.TotalPrice=response.CartItems.Sum(x=>x.LinePrice);
+            return response;
+
+        }
+
+        public async Task<CartItemResponseDto> UpdateCartItemQuantityAsync(int id,UpdateCartItemDto request)
+        {
+           var cartItem=await _cartRepository.GetCartItemByIdAsync(id);
+            if(cartItem == null) { throw new NotFoundException("Ürün mevcut değildir."); }
+            if (cartItem.UserId != GetUserId()) { throw new UnauthorizedException("Bu işlem için yetkiniz yoktur."); }
+            if (request.Quantity > cartItem.Product.Stock) { throw new BadRequestException("Talep ettiğiniz miktarda ürün stokta bulunmamaktadır."); }
+            cartItem.Quantity = request.Quantity;
+            cartItem=await _cartRepository.UpdateCartItemAsync(cartItem);
+            var response=_mapper.Map<CartItemResponseDto>(cartItem);
+            return response;
         }
     }
 }

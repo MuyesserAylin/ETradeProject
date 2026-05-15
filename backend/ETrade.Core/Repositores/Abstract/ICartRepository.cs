@@ -16,5 +16,10 @@ namespace ETrade.Core.Repositores.Abstract
         public Task<CartItem> UpdateCartItemAsync(CartItem cartItem);
         public Task<List<CartItem>> GetAllCartItemAsync(int userId);
         public Task<CartItem?> GetCartItemByIdAsync(int id);
+        public Task<CartItem?> GetCartItemByIdWithoutProductAsync(int id);
+        public Task DeleteCartItemAsync(CartItem cartItem);
+        public Task DeleteAllCartItemsByUserIdAsync(int userId);
+        public Task DeleteCartItemByProductIdAsync(int productId);
+
     }
 }

@@ -45,5 +45,12 @@ namespace ETrade.API.Controllers
             var result = await _productService.UpdateProductAsync(id,request);
             return Ok(ApiResponse<ProductResponseDto>.SuccesResponse(result, "Ürün bilgileri güncellendi.", 200));
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProductAsync(int id)
+        {
+            await _productService.DeleteProductAsync(id);
+            return StatusCode(200,ApiResponse<object>.SuccesResponse( "Ürün silindi.", 200));
+        }
     }
 }

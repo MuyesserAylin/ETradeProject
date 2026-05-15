@@ -27,6 +27,13 @@ namespace ETrade.Core.Repositores.Concrete
             return product;
         }
 
+        public async Task DeleteProductAsync(Product product)
+        {
+            product.IsDeleted = true;
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<List<Product>> GetAllProductsAsync(int? categoryId)
         {
             var query =_context.Products

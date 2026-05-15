@@ -24,6 +24,26 @@ namespace ETrade.Core.Repositores.Concrete
             return cartItem;
         }
 
+        public async Task DeleteAllCartItemsByUserIdAsync(int userId)
+        {
+            var cartItems = _context.CartItems.Where(c => c.UserId == userId);
+            _context.RemoveRange(cartItems);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteCartItemAsync(CartItem cartItem)
+        {
+             _context.CartItems.Remove(cartItem);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteCartItemByProductIdAsync(int productId)
+        {
+            var cartItems=_context.CartItems.Where(c=>c.ProductId == productId);
+            _context.RemoveRange(cartItems);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<List<CartItem>> GetAllCartItemAsync(int userId)
         {
             return await _context.CartItems
@@ -39,9 +59,16 @@ namespace ETrade.Core.Repositores.Concrete
                 .FirstOrDefaultAsync(c=>c.Id == id);
         }
 
+        public async Task<CartItem?> GetCartItemByIdWithoutProductAsync(int id)
+        {
+            return await _context.CartItems
+                .FirstOrDefaultAsync(p=>p.Id == id);
+        }
+
         public async Task<CartItem?> GetCartItemByUserAndProductAsync(int userId, int productId)
         {
-            return await _context.CartItems.FirstOrDefaultAsync(c=>c.UserId == userId && c.ProductId == productId); 
+            return await _context.CartItems
+                .FirstOrDefaultAsync(c=>c.UserId == userId && c.ProductId == productId); 
         }
 
         public async Task<CartItem> UpdateCartItemAsync(CartItem cartItem)

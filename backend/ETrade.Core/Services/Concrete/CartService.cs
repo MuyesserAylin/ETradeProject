@@ -87,6 +87,14 @@ namespace ETrade.Core.Services.Concrete
 
         }
 
+        public async Task DeleteCartItemAsync(int id)
+        {
+            var cartItem=await _cartRepository.GetCartItemByIdWithoutProductAsync(id);
+            if(cartItem == null) { throw new NotFoundException("Silinmek istenen ürün bulunamadı."); }
+            if (cartItem.UserId != GetUserId()) { throw new UnauthorizedException("Bu işlem için yetkiniz yoktur."); }
+            await  _cartRepository.DeleteCartItemAsync(cartItem);
+        }
+
         public async Task<CartItemResponseDto> UpdateCartItemQuantityAsync(int id,UpdateCartItemDto request)
         {
            var cartItem=await _cartRepository.GetCartItemByIdAsync(id);
@@ -97,6 +105,12 @@ namespace ETrade.Core.Services.Concrete
             cartItem=await _cartRepository.UpdateCartItemAsync(cartItem);
             var response=_mapper.Map<CartItemResponseDto>(cartItem);
             return response;
+        }
+
+        public async Task ClearCartAsync()
+        {
+            var userId=GetUserId();
+            await _cartRepository.DeleteAllCartItemsByUserIdAsync(userId);
         }
     }
 }

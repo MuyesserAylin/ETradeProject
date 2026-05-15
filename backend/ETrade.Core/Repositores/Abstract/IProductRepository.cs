@@ -21,6 +21,8 @@ namespace ETrade.Core.Repositores.Abstract
 
         public Task<Product> UpdateProductAsync(Product product);
         public Task<Product?> GetProductByIdWithoutCategoryAsync(int id);
+        public Task DeleteProductAsync(Product product);
+
 
     }
 }

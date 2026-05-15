@@ -48,7 +48,7 @@ namespace ETrade.API.Controllers
         [HttpDelete("{categoryId}")]
         public async Task<IActionResult> DeleteCategoryAsync(int categoryId)
         {    await _categoryService.DeleteCategoryAsync(categoryId);
-            return   Ok(ApiResponse<object>.SuccesResponse("Kategori silindi.", 200));
+            return StatusCode(200,ApiResponse<object>.SuccesResponse("Kategori silindi.", 200));
         }
     } 
 

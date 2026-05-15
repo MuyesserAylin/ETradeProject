@@ -18,11 +18,14 @@ namespace ETrade.Core.Services.Concrete
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly ICartRepository _cartRepository;
         private readonly IMapper _mapper;
-        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository,IMapper mapper)
+        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository,
+            ICartRepository cartRepositpry,IMapper mapper)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
+            _cartRepository = cartRepositpry;
             _mapper = mapper;
         }
 
@@ -44,6 +47,15 @@ namespace ETrade.Core.Services.Concrete
             var response=_mapper.Map<ProductResponseDto>(createdProduct);
             response.CategoryName= category.Name;
             return response;
+
+        }
+
+        public async Task DeleteProductAsync(int id)
+        {
+           var product=await _productRepository.GetProductByIdWithoutCategoryAsync(id);
+            if (product == null) { throw new NotFoundException("Silinmek istenen ürün mevcut değildir."); }
+            await _cartRepository.DeleteCartItemByProductIdAsync(product.Id);
+            await _productRepository.DeleteProductAsync(product);
 
         }
 

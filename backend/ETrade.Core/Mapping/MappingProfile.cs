@@ -34,6 +34,17 @@ namespace ETrade.Core.Mapping
                 .ForMember(dest => dest.UnitPrice, opt => opt.MapFrom(src => src.Product!=null ? src.Product.Price :0))
                  .ForMember(dest=>dest.LinePrice,opt=>opt.MapFrom(src=>src.Product!=null ? src.Product.Price*src.Quantity :0));
 
+            CreateMap<CartItem, OrderItem>()
+                .ForMember(dest => dest.UnitPrice, opt => opt.MapFrom(src => src.Product.Price));
+
+            CreateMap<CartItem, OrderItemResponseDto>()
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+                .ForMember(dest => dest.UnitPrice, opt => opt.MapFrom(src => src.Product.Price))
+                .ForMember(dest => dest.SubTotal, opt => opt.MapFrom(src => src.Product.Price * src.Quantity));
+
+            CreateMap<Order, OrderResponseDto>()
+                .ForMember(dest => dest.OrderItems, opt => opt.Ignore());
+
 
         }
     }

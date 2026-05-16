@@ -76,5 +76,11 @@ namespace ETrade.Core.Repositores.Concrete
             await _context.SaveChangesAsync();
             return product;
         }
+
+        public async Task UpdateStocksAsync(List<Product> products)
+        {
+            _context.Products.UpdateRange(products);
+            await _context.SaveChangesAsync();
+        }
     }
 }

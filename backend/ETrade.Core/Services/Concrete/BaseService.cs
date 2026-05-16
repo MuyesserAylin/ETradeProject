@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace ETrade.Core.Services.Abstract
+namespace ETrade.Core.Services.Concrete
 {
     public class BaseService
     {

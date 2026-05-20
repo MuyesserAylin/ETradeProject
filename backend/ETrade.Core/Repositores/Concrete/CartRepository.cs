@@ -70,6 +70,12 @@ namespace ETrade.Core.Repositores.Concrete
             return await _context.CartItems
                 .FirstOrDefaultAsync(c=>c.UserId == userId && c.ProductId == productId); 
         }
+        public async Task<CartItem?> GetCartItemByUserAndProductWithProductAsync(int userId, int productId)
+        {
+            return await _context.CartItems
+                .Include(w=>w.Product)
+                .FirstOrDefaultAsync(c => c.UserId == userId && c.ProductId == productId);
+        }
 
         public async Task<CartItem> UpdateCartItemAsync(CartItem cartItem)
         {

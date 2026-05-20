@@ -97,9 +97,8 @@ namespace ETrade.Core.Services.Concrete
 
         public async Task<CartItemResponseDto> UpdateCartItemQuantityAsync(int id,UpdateCartItemDto request)
         {
-           var cartItem=await _cartRepository.GetCartItemByIdAsync(id);
-            if(cartItem == null) { throw new NotFoundException("Ürün mevcut değildir."); }
-            if (cartItem.UserId != GetUserId()) { throw new UnauthorizedException("Bu işlem için yetkiniz yoktur."); }
+            var cartItem = await _cartRepository.GetCartItemByUserAndProductWithProductAsync(GetUserId(), id);
+            if(cartItem == null) { throw new NotFoundException("Bu ürün sepetinizde mevcut değildir."); }
             if (request.Quantity > cartItem.Product.Stock) { throw new BadRequestException("Talep ettiğiniz miktarda ürün stokta bulunmamaktadır."); }
             cartItem.Quantity = request.Quantity;
             cartItem=await _cartRepository.UpdateCartItemAsync(cartItem);

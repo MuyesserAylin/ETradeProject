@@ -11,5 +11,9 @@ namespace ETrade.Core.Services.Abstract
     public interface IOrderService
     {
         public Task<OrderResponseDto> CreateOrderFromCartAsync(CreateOrderRequestDto request);
+
+        public Task<OrderResponseDto> CreateDirectOrderAsync(DirectOrderRequestDto request);
+        public Task<List<OrderSummaryDto>> GetAllOrdersAsync();
+        public Task<List<OrderSummaryDto>> GetUserOrderAsync();
     }
 }

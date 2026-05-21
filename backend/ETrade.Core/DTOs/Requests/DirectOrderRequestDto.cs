@@ -7,11 +7,14 @@ using System.Threading.Tasks;
 
 namespace ETrade.Core.DTOs.Requests
 {
-    public class AddToCartDto
+    public class DirectOrderRequestDto:CreateOrderRequestDto
     {
-        [Required(ErrorMessage ="Sepete eklemek istediğiniz ürünü seçiniz.")]
+
+        [Required(ErrorMessage = "Sipariş etmek istediğiniz ürünü seçiniz.")]
         public int ProductId { get; set; }
         [Range(1, 100000)]
         public int Quantity { get; set; } = 1;
+
+
     }
 }

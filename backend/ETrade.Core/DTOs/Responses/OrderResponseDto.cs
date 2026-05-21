@@ -7,12 +7,9 @@ using System.Threading.Tasks;
 
 namespace ETrade.Core.DTOs.Responses
 {
-    public class OrderResponseDto
+    public class OrderResponseDto:OrderSummaryDto
     {
-        public int Id { get; set; }
-        public DateTime OrderDate {  get; set; }
-        public OrderStatus Status { get; set; }
-        public decimal TotalAmount { get; set; }
+       
         public string ShippingAddress { get; set; } =null!;
         public string CustomerPhone { get; set; } = null!;
         public List<OrderItemResponseDto> OrderItems { get; set; } = new List<OrderItemResponseDto>();

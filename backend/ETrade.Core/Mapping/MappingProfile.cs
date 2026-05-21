@@ -45,7 +45,11 @@ namespace ETrade.Core.Mapping
             CreateMap<Order, OrderResponseDto>()
                 .ForMember(dest => dest.OrderItems, opt => opt.Ignore());
 
+            CreateMap<OrderItem, OrderItemResponseDto>()
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product != null ? src.Product.Name : string.Empty))
+                .ForMember(dest => dest.SubTotal, opt => opt.MapFrom(src => src.UnitPrice * src.Quantity));
 
+            CreateMap<Order, OrderSummaryDto>();
         }
     }
 }

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -37,6 +38,41 @@ namespace ETrade.Core.Services.Concrete
             _productRepository = productRepository;
             _mapper = mapper;
             _context = context;
+        }
+
+        public async Task<OrderResponseDto> CreateDirectOrderAsync(DirectOrderRequestDto request)
+        {
+            var userId=GetUserId();
+           var product=await _productRepository.GetProductByIdWithoutCategoryAsync(request.ProductId);
+            if (product == null) { throw new NotFoundException("Bu ürün mevcut değildir."); }
+            if (product.Stock == 0) { throw new BadRequestException("Ürünün stoğu yoktur."); }
+            if (product.Stock < request.Quantity) {
+                throw new BadRequestException("Ürünün yeterli" +
+                " stoğu yoktur.");}
+            var order = await _orderRepository.AddOrderAsync(new Order
+            {
+                UserId = userId,
+                ShippingAddress = request.ShippingAddress,
+                CustomerPhone = request.CustomerPhone,
+                TotalAmount=product.Price*request.Quantity,
+            });
+            var orderItem = await _orderRepository.AddOrderItemAsync(new OrderItem
+            {
+                OrderId=order.Id,
+                ProductId=product.Id,
+                Quantity=request.Quantity,
+                UnitPrice=product.Price,
+
+            });
+
+            product.Stock -= orderItem.Quantity;
+            product=await _productRepository.UpdateProductAsync(product);
+            var orderItemResponse=_mapper.Map<OrderItemResponseDto>(orderItem);
+            orderItemResponse.ProductName = product.Name;
+            var response = _mapper.Map<OrderResponseDto>(order);
+            response.OrderItems.Add(orderItemResponse);
+            return response;
+
         }
 
         public async Task<OrderResponseDto> CreateOrderFromCartAsync(CreateOrderRequestDto request)
@@ -80,6 +116,21 @@ namespace ETrade.Core.Services.Concrete
                 await transaction.RollbackAsync();
                 throw;
             }
+        }
+
+        public async Task<List<OrderSummaryDto>> GetAllOrdersAsync()
+        {
+            var orders= await _orderRepository.GetAllOrdersAsync();
+            var responses=_mapper.Map<List<OrderSummaryDto>>(orders);
+            return responses;
+        }
+
+        public async Task<List<OrderSummaryDto>> GetUserOrderAsync()
+        {
+            var userId = GetUserId();
+            var orders=await _orderRepository.GetUserOrderAsync(userId);
+            var responses=_mapper.Map<List<OrderSummaryDto>>(orders);
+            return responses;
         }
     }
 }

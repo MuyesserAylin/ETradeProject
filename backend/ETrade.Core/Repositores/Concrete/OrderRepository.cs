@@ -1,6 +1,7 @@
 ﻿using ETrade.Core.Data;
 using ETrade.Core.Entities;
 using ETrade.Core.Repositores.Abstract;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,11 +22,30 @@ namespace ETrade.Core.Repositores.Concrete
             return order;
         }
 
+        public async Task<OrderItem> AddOrderItemAsync(OrderItem orderItem)
+        {
+            await _context.AddAsync(orderItem);
+            await _context.SaveChangesAsync();
+            return orderItem;
+        }
+
         public async  Task<List<OrderItem>> AddOrderItemsAsync(List<OrderItem> orderItems)
         {
             await _context.OrderItems.AddRangeAsync(orderItems);
             await _context.SaveChangesAsync();
             return orderItems;
+        }
+
+        public async Task<List<Order>> GetAllOrdersAsync()
+        {
+           return  await _context.Orders.ToListAsync();
+        }
+
+        public async Task<List<Order>> GetUserOrderAsync(int userId)
+        {
+            return await _context.Orders
+                .Where(o=>o.UserId==userId)
+                .ToListAsync();
         }
 
         public async Task UpdateOrderAsync(Order order)

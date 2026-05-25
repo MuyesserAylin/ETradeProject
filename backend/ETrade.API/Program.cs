@@ -1,4 +1,4 @@
-using ETrade.API.Middlewares;
+ï»¿using ETrade.API.Middlewares;
 using ETrade.Core.Data;
 using ETrade.Core.DTOs.Responses;
 using ETrade.Core.Helpers;
@@ -16,14 +16,14 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// DB baðlantýsý
+// DB baÄŸlantÄ±sÄ±
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD_PROJE1");
 var fullConnectionString = $"{connectionString} Password={dbPassword};";
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(fullConnectionString));
 
-// Repository ve Service kayýtlar
+// Repository ve Service kayÄ±tlar
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IProductRepository, ProductRepository>(); 
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -35,11 +35,12 @@ builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService,CartService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IEmailService,MailService>();
 
 builder.Services.AddScoped<JwtHelper>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-// JWT ayarlarý
+// JWT ayarlarÄ±
 var secretKey = builder.Configuration["JwtSettings:SecretKey"];
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -62,14 +63,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 context.HandleResponse();
                 context.Response.StatusCode = 401;
                 context.Response.ContentType = "application/json";
-                var response = ApiResponse<object>.FailResponse("Giriþ yapmanýz gerekiyor.", 401);
+                var response = ApiResponse<object>.FailResponse("GiriÅŸ yapmanÄ±z gerekiyor.", 401);
                 await context.Response.WriteAsJsonAsync(response);
             },
             OnForbidden = async context =>
             {
                 context.Response.StatusCode = 403;
                 context.Response.ContentType = "application/json";
-                var response = ApiResponse<object>.FailResponse("Bu iþlem için yetkiniz yok.", 403);
+                var response = ApiResponse<object>.FailResponse("Bu iÅŸlem iÃ§in yetkiniz yok.", 403);
                 await context.Response.WriteAsJsonAsync(response);
             }
         };
@@ -88,7 +89,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
             );
 
         var response = ApiResponse<Dictionary<string, List<string>>>
-            .FailResponse("Validation hatasý.", 400);
+            .FailResponse("Validation hatasÄ±.", 400);
         response.Data = errors;
 
         return new BadRequestObjectResult(response);

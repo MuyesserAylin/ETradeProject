@@ -15,14 +15,14 @@ namespace ETrade.Core.Repositores.Concrete
         private readonly AppDbContext _context;
         public OrderRepository(AppDbContext context) { _context = context; }
 
-        public async Task<Order> AddOrderAsync(Order order)
+        public async Task<Order?> AddOrderAsync(Order order)
         {
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
             return order;
         }
 
-        public async Task<OrderItem> AddOrderItemAsync(OrderItem orderItem)
+        public async Task<OrderItem?> AddOrderItemAsync(OrderItem orderItem)
         {
             await _context.AddAsync(orderItem);
             await _context.SaveChangesAsync();
@@ -41,11 +41,20 @@ namespace ETrade.Core.Repositores.Concrete
            return  await _context.Orders.ToListAsync();
         }
 
-        public async Task<List<Order>> GetUserOrderAsync(int userId)
+        public async Task<List<Order>> GetOrdersByUserIdAsync(int userId)
         {
             return await _context.Orders
                 .Where(o=>o.UserId==userId)
                 .ToListAsync();
+        }
+
+        public async Task<Order?> GetOrderWithDetails(int id)
+        {
+            return await _context.Orders
+                .Include(o => o.User)
+                .Include(o => o.OrderItems)
+                 .ThenInclude(oi => oi.Product)
+                .FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task UpdateOrderAsync(Order order)

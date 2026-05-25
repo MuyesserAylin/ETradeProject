@@ -50,6 +50,13 @@ namespace ETrade.Core.Mapping
                 .ForMember(dest => dest.SubTotal, opt => opt.MapFrom(src => src.UnitPrice * src.Quantity));
 
             CreateMap<Order, OrderSummaryDto>();
+
+
+            CreateMap<Order, OrderDetailResponseDto>()
+                .ForMember(dest => dest.OrderItems, opt => opt.Ignore())
+                .ForMember(dest => dest.CustomerFullName, opt => opt.MapFrom(src => src.User != null ? src.User.FullName : string.Empty))
+                .ForMember(dest => dest.CustomerEmail, opt => opt.MapFrom(src => src.User != null ? src.User.Email : string.Empty));
+                
         }
     }
 }

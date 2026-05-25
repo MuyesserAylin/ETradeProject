@@ -10,10 +10,12 @@ namespace ETrade.Core.Repositores.Abstract
     public interface IOrderRepository
     {
         public Task<List<OrderItem>> AddOrderItemsAsync(List<OrderItem> orderItems);
-        public Task<Order> AddOrderAsync(Order order);
+        public Task<Order?> AddOrderAsync(Order order);
         public Task UpdateOrderAsync(Order order);
-        public Task <OrderItem> AddOrderItemAsync(OrderItem orderItem);
+        public Task <OrderItem?> AddOrderItemAsync(OrderItem orderItem);
         public Task<List<Order>> GetAllOrdersAsync();
-        public Task<List<Order>> GetUserOrderAsync(int userId);
-    }
+        public Task<List<Order>> GetOrdersByUserIdAsync(int userId);
+        public Task<Order?> GetOrderWithDetails(int id);
+
+     }
 }

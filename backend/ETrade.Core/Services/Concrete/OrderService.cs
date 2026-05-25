@@ -8,6 +8,7 @@ using ETrade.Core.Mapping;
 using ETrade.Core.Repositores.Abstract;
 using ETrade.Core.Services.Abstract;
 using Microsoft.AspNetCore.Http;
+using Org.BouncyCastle.Asn1.Esf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,13 +25,15 @@ namespace ETrade.Core.Services.Concrete
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
         private readonly AppDbContext _context;
+        private readonly IEmailService _emailService;
 
         public OrderService(IHttpContextAccessor httpContextAccessor,
             IOrderRepository orderRepository,
             ICartRepository cartRepository,
             IProductRepository productRepository,
             IMapper mapper,
-            AppDbContext context)
+            AppDbContext context
+            ,IEmailService emailService)
             : base(httpContextAccessor)
         {
             _orderRepository = orderRepository;
@@ -38,41 +41,51 @@ namespace ETrade.Core.Services.Concrete
             _productRepository = productRepository;
             _mapper = mapper;
             _context = context;
+            _emailService = emailService;
         }
 
-        public async Task<OrderResponseDto> CreateDirectOrderAsync(DirectOrderRequestDto request)
+        public async  Task<OrderResponseDto> CreateDirectOrderAsync(DirectOrderRequestDto request)
         {
-            var userId=GetUserId();
-           var product=await _productRepository.GetProductByIdWithoutCategoryAsync(request.ProductId);
-            if (product == null) { throw new NotFoundException("Bu ürün mevcut değildir."); }
-            if (product.Stock == 0) { throw new BadRequestException("Ürünün stoğu yoktur."); }
-            if (product.Stock < request.Quantity) {
-                throw new BadRequestException("Ürünün yeterli" +
-                " stoğu yoktur.");}
-            var order = await _orderRepository.AddOrderAsync(new Order
+           var userId=GetUserId();
+            var product=await _productRepository.GetProductByIdWithoutCategoryAsync(request.ProductId);
+            if (product == null) { throw new NotFoundException("Ürün mevcut değildir."); }
+            if (product.Stock <= 0) { throw new BadRequestException("Ürünün stoku yoktur."); }
+            if (product.Stock < request.Quantity) { throw new BadRequestException("İstenen miktarda ürün mevcut değildir."); }
+            using var transaction=await _context.Database.BeginTransactionAsync();
+            try
             {
-                UserId = userId,
-                ShippingAddress = request.ShippingAddress,
-                CustomerPhone = request.CustomerPhone,
-                TotalAmount=product.Price*request.Quantity,
-            });
-            var orderItem = await _orderRepository.AddOrderItemAsync(new OrderItem
+                var order = await _orderRepository.AddOrderAsync(new Order
+                {
+                    UserId = userId,
+                    TotalAmount = product.Price * request.Quantity,
+                    ShippingAddress = request.ShippingAddress,
+                    CustomerPhone = request.CustomerPhone,
+                });
+                var orderItem = await _orderRepository.AddOrderItemAsync(new OrderItem
+                {
+                    OrderId = order.Id,
+                    ProductId = product.Id,
+                    Quantity = request.Quantity,
+                    UnitPrice = product.Price
+
+                });
+                product.Stock -= orderItem.Quantity;
+                product = await _productRepository.UpdateProductAsync(product);
+                var orderItemResponse = _mapper.Map<OrderItemResponseDto>(orderItem);
+                orderItemResponse.ProductName = product.Name;
+                var response = _mapper.Map<OrderResponseDto>(order);
+                response.OrderItems.Add(orderItemResponse);
+                await transaction.CommitAsync();
+                await _emailService.SendOrderConfirmationAsync(GetUserEmail(), response);
+                return response;
+
+            }
+            catch
             {
-                OrderId=order.Id,
-                ProductId=product.Id,
-                Quantity=request.Quantity,
-                UnitPrice=product.Price,
-
-            });
-
-            product.Stock -= orderItem.Quantity;
-            product=await _productRepository.UpdateProductAsync(product);
-            var orderItemResponse=_mapper.Map<OrderItemResponseDto>(orderItem);
-            orderItemResponse.ProductName = product.Name;
-            var response = _mapper.Map<OrderResponseDto>(order);
-            response.OrderItems.Add(orderItemResponse);
-            return response;
-
+                await transaction.RollbackAsync();
+                throw;
+            }
+           
         }
 
         public async Task<OrderResponseDto> CreateOrderFromCartAsync(CreateOrderRequestDto request)
@@ -109,6 +122,7 @@ namespace ETrade.Core.Services.Concrete
                 response.OrderItems = orderItemResponses;
                 await _cartRepository.DeleteAllCartItemsByUserIdAsync(userId);
                 await transaction.CommitAsync();
+                await _emailService.SendOrderConfirmationAsync(GetUserEmail(), response);
                 return response;
             }
             catch
@@ -120,17 +134,34 @@ namespace ETrade.Core.Services.Concrete
 
         public async Task<List<OrderSummaryDto>> GetAllOrdersAsync()
         {
-            var orders= await _orderRepository.GetAllOrdersAsync();
-            var responses=_mapper.Map<List<OrderSummaryDto>>(orders);
-            return responses;
+            List<Order> orders;
+            if (GetUserRole() == "Admin")
+            {
+               orders=await _orderRepository.GetAllOrdersAsync();
+            }
+            else
+            {
+                orders=await _orderRepository.GetOrdersByUserIdAsync(GetUserId());
+            }
+
+                return _mapper.Map<List<OrderSummaryDto>>(orders);
+           
         }
 
-        public async Task<List<OrderSummaryDto>> GetUserOrderAsync()
+       
+
+        public async Task<OrderDetailResponseDto> GetOrderByIdAsync(int id)
         {
-            var userId = GetUserId();
-            var orders=await _orderRepository.GetUserOrderAsync(userId);
-            var responses=_mapper.Map<List<OrderSummaryDto>>(orders);
-            return responses;
+            var order=await _orderRepository.GetOrderWithDetails(id);
+            if (order == null) { throw new NotFoundException("Sipariş bulunamadı."); }
+            if(GetUserRole()!="Admin" && order.UserId != GetUserId())
+            {
+                throw new UnauthorizedException("Bu siparişi görüntüleme yetkiniz yok.");
+            }
+            var orderDetailResponse=_mapper.Map<OrderDetailResponseDto>(order);
+            orderDetailResponse.OrderItems = _mapper.Map<List<OrderItemResponseDto>>(order.OrderItems);
+            return orderDetailResponse;
+            
         }
     }
 }

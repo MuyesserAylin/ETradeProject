@@ -22,5 +22,15 @@ namespace ETrade.Core.Services.Concrete
                 _httpContextAccessor.HttpContext!.User
                 .FindFirst(ClaimTypes.NameIdentifier)!.Value);
         }
+        protected string  GetUserEmail()
+        {
+            return _httpContextAccessor.HttpContext!.User
+             .FindFirst(ClaimTypes.Email)!.Value;
+        }
+        protected string GetUserRole()
+        {
+            return _httpContextAccessor.HttpContext!.User
+                .FindFirst(ClaimTypes.Role)!.Value;
+        }
     }
 }

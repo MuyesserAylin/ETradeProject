@@ -3,12 +3,14 @@ using ETrade.Core.Data;
 using ETrade.Core.DTOs.Requests;
 using ETrade.Core.DTOs.Responses;
 using ETrade.Core.Entities;
+using ETrade.Core.Enums;
 using ETrade.Core.Exceptions;
 using ETrade.Core.Mapping;
 using ETrade.Core.Repositores.Abstract;
 using ETrade.Core.Services.Abstract;
 using Microsoft.AspNetCore.Http;
 using Org.BouncyCastle.Asn1.Esf;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,6 +44,39 @@ namespace ETrade.Core.Services.Concrete
             _mapper = mapper;
             _context = context;
             _emailService = emailService;
+        }
+
+        public async Task<OrderDetailResponseDto> CancelOrderAsync(int id)
+        {
+            var order = await _orderRepository.GetOrderWithDetails(id);
+            if(order == null) { throw new NotFoundException("Sipariş bulunamadı."); }
+            if (order.UserId != GetUserId()) { throw new UnauthorizedException("Bu işlem için yetkiniz yoktur."); }
+            if (order.Status == OrderStatus.Cancelled)
+                throw new BadRequestException("Sipariş zaten iptal edilmiş.");
+            if (order.Status == OrderStatus.Shipped || order.Status == OrderStatus.Delivered)
+                throw new BadRequestException("Kargoya verilen veya teslim edilen sipariş iptal edilemez.");
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                order.Status = OrderStatus.Cancelled;
+
+                    foreach (var orderItem in order.OrderItems)
+                        orderItem.Product.Stock += orderItem.Quantity;
+                    await _productRepository.UpdateStocksAsync(order.OrderItems.Select(oi => oi.Product).ToList());
+                
+                order = await _orderRepository.UpdateOrderAsync(order);
+                await transaction.CommitAsync();
+                var orderDetailResponse = _mapper.Map<OrderDetailResponseDto>(order);
+                orderDetailResponse.OrderItems = _mapper.Map<List<OrderItemResponseDto>>(order.OrderItems);
+                await _emailService.SendOrderCancelledAsync(order.User.Email, order.Id);
+                return orderDetailResponse;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+
         }
 
         public async  Task<OrderResponseDto> CreateDirectOrderAsync(DirectOrderRequestDto request)
@@ -116,7 +151,7 @@ namespace ETrade.Core.Services.Concrete
                 await _productRepository.UpdateStocksAsync(cartItems.Select(c => c.Product).ToList());
                 orderItems = await _orderRepository.AddOrderItemsAsync(orderItems);
                 order.TotalAmount = orderItems.Sum(o => o.UnitPrice * o.Quantity);
-                await _orderRepository.UpdateOrderAsync(order);
+                order=await _orderRepository.UpdateOrderAsync(order);
                 var orderItemResponses = _mapper.Map<List<OrderItemResponseDto>>(cartItems);
                 var response = _mapper.Map<OrderResponseDto>(order);
                 response.OrderItems = orderItemResponses;
@@ -162,6 +197,36 @@ namespace ETrade.Core.Services.Concrete
             orderDetailResponse.OrderItems = _mapper.Map<List<OrderItemResponseDto>>(order.OrderItems);
             return orderDetailResponse;
             
+        }
+
+        public async Task<OrderDetailResponseDto> UpdateOrderStatusAsync(int id,UpdateOrderStatusDto request)
+        {
+            var order = await _orderRepository.GetOrderWithDetails(id);
+            if (order == null) { throw new NotFoundException("Sipariş bulunamadı."); }
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                order.Status = request.Status;
+                if (order.Status == OrderStatus.Cancelled)
+                {
+                    foreach (var orderItem in order.OrderItems)
+                        orderItem.Product.Stock += orderItem.Quantity;
+                    await _productRepository.UpdateStocksAsync(order.OrderItems.Select(oi => oi.Product).ToList());
+                }
+                order = await _orderRepository.UpdateOrderAsync(order);
+                await transaction.CommitAsync();
+                var orderDetailResponse = _mapper.Map<OrderDetailResponseDto>(order);
+                orderDetailResponse.OrderItems = _mapper.Map<List<OrderItemResponseDto>>(order.OrderItems);
+                await _emailService.SendOrderStatusChangedAsync(order.User.Email,order.Id,order.Status);
+                return orderDetailResponse;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+            
+
         }
     }
 }

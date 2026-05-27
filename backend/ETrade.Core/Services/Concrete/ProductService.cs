@@ -6,6 +6,7 @@ using ETrade.Core.Exceptions;
 using ETrade.Core.Mapping;
 using ETrade.Core.Repositores.Abstract;
 using ETrade.Core.Services.Abstract;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,14 +15,16 @@ using System.Threading.Tasks;
 
 namespace ETrade.Core.Services.Concrete
 {
-    public class ProductService : IProductService
+    public class ProductService : BaseService,IProductService
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly ICartRepository _cartRepository;
         private readonly IMapper _mapper;
-        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository,
+        public ProductService(IHttpContextAccessor httpContextAccessor,
+            IProductRepository productRepository, ICategoryRepository categoryRepository,
             ICartRepository cartRepositpry,IMapper mapper)
+            : base(httpContextAccessor)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
@@ -62,15 +65,18 @@ namespace ETrade.Core.Services.Concrete
         public async Task<List<ProductResponseDto>> GetAllProductsAsync(int? categoryId)
         {
             List<Product> products;
-            if(categoryId.HasValue)
+            if (categoryId.HasValue)
             {
                 var category = await _categoryRepository.GetByIdCategoryAsync(categoryId.Value);
-                if(category == null)
-                {
+                if (category == null)
                     throw new NotFoundException("Ürünlerini listelemek istediğiniz kategori mevcut değildir");
-                }
             }
-            products = await _productRepository.GetAllProductsAsync(categoryId);
+
+            if (GetUserRole() == "Admin")
+                products = await _productRepository.GetAllProductsIncludeDeletedAsync(categoryId);
+            else
+                products = await _productRepository.GetAllProductsAsync(categoryId);
+
             return _mapper.Map<List<ProductResponseDto>>(products);
         }
 

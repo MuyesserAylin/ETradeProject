@@ -50,5 +50,21 @@ namespace ETrade.API.Controllers
             return Ok(ApiResponse<OrderDetailResponseDto>.SuccesResponse(result, "Siparişin detayı görüntüleniyor",200));
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> UpdateOrderStatusAsync(int id, [FromBody] UpdateOrderStatusDto request)
+        {
+            var result = await _orderService.UpdateOrderStatusAsync(id, request);
+            return Ok(ApiResponse<OrderDetailResponseDto>.SuccesResponse(result, "Sipariş durumu güncellendi.", 200));
+        }
+
+        [Authorize(Roles ="Customer")]
+        [HttpPatch("{id}/cancel")]
+        public async Task<IActionResult> CancelOrderAsync(int id)
+        {
+            var result=await _orderService.CancelOrderAsync(id);
+            return Ok(ApiResponse<OrderDetailResponseDto>.SuccesResponse(result, "Sipariş durumu güncellendi.", 200));
+        }
+
     }
 }

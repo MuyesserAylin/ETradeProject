@@ -23,6 +23,7 @@ namespace ETrade.Core.Repositores.Abstract
         public Task<Product?> GetProductByIdWithoutCategoryAsync(int id);
         public Task DeleteProductAsync(Product product);
         public Task UpdateStocksAsync(List<Product> products);
+        public Task<List<Product>> GetAllProductsIncludeDeletedAsync(int ?categoryId);
 
 
     }

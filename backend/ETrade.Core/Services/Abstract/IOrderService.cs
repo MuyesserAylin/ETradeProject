@@ -16,5 +16,7 @@ namespace ETrade.Core.Services.Abstract
         public Task<List<OrderSummaryDto>> GetAllOrdersAsync();
     
         public Task<OrderDetailResponseDto> GetOrderByIdAsync(int id);
+        public Task<OrderDetailResponseDto> UpdateOrderStatusAsync(int id,UpdateOrderStatusDto request);
+        public Task<OrderDetailResponseDto> CancelOrderAsync(int id);
     }
 }

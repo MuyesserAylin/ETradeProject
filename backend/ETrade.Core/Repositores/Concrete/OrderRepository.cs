@@ -57,10 +57,11 @@ namespace ETrade.Core.Repositores.Concrete
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 
-        public async Task UpdateOrderAsync(Order order)
+        public async Task<Order> UpdateOrderAsync(Order order)
         {
             _context.Orders.Update(order);
             await _context.SaveChangesAsync();
+            return order;
         }
     }
 }

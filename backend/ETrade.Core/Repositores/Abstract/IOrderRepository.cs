@@ -11,7 +11,7 @@ namespace ETrade.Core.Repositores.Abstract
     {
         public Task<List<OrderItem>> AddOrderItemsAsync(List<OrderItem> orderItems);
         public Task<Order?> AddOrderAsync(Order order);
-        public Task UpdateOrderAsync(Order order);
+        public Task<Order> UpdateOrderAsync(Order order);
         public Task <OrderItem?> AddOrderItemAsync(OrderItem orderItem);
         public Task<List<Order>> GetAllOrdersAsync();
         public Task<List<Order>> GetOrdersByUserIdAsync(int userId);

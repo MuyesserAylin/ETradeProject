@@ -47,6 +47,20 @@ namespace ETrade.Core.Repositores.Concrete
 
         }
 
+        public async Task<List<Product>> GetAllProductsIncludeDeletedAsync(int? categoryId )
+        {
+            var query=_context.Products
+                .IgnoreQueryFilters()
+                .Include(p => p.Category)
+                .AsQueryable();
+
+            if (categoryId.HasValue)
+            {
+                query.Where(x=> x.CategoryId == categoryId);
+            }
+            return await  query.ToListAsync();
+        }
+
         public async Task<Product?> GetProductByIdAsync(int id)
         {
             return await _context.Products

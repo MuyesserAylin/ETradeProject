@@ -1,36 +1,24 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import Navbar from "../components/Navbar";
+// src/app/layout.tsx
+import { CartProvider } from '@/context/CartContext';
+import './globals.css'; // veya global.css sende hangisi varsa
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "ETrade",
-  description: "E-Ticaret Uygulaması",
+export const metadata = {
+  title: 'ETrade - Premium Alışveriş',
+  description: '.NET Core & Next.js E-Commerce',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html
-      lang="tr"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
-        <Navbar />
-        {children}
+    <html lang="tr">
+      <body>
+        {/* Bütün uygulamayı sepet koruyucusu ile sarmalıyoruz */}
+        <CartProvider>
+          {children}
+        </CartProvider>
       </body>
     </html>
   );

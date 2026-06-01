@@ -40,6 +40,17 @@ builder.Services.AddScoped<IEmailService,MailService>();
 builder.Services.AddScoped<JwtHelper>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+
 // JWT ayarları
 var secretKey = builder.Configuration["JwtSettings:SecretKey"];
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -152,7 +163,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseMiddleware<GlobalExceptionMiddleware>(); 
+app.UseMiddleware<GlobalExceptionMiddleware>();
+app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();
 app.UseAuthentication(); 
 app.UseAuthorization();

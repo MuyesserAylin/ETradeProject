@@ -27,10 +27,10 @@ namespace ETrade.Core.Services.Concrete
             return _httpContextAccessor.HttpContext!.User
              .FindFirst(ClaimTypes.Email)!.Value;
         }
-        protected string GetUserRole()
+        protected string? GetUserRole()
         {
-            return _httpContextAccessor.HttpContext!.User
-                .FindFirst(ClaimTypes.Role)!.Value;
+            return _httpContextAccessor.HttpContext?.User
+                .FindFirst(ClaimTypes.Role)?.Value;
         }
     }
 }

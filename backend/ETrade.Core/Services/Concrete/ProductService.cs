@@ -72,7 +72,10 @@ namespace ETrade.Core.Services.Concrete
                     throw new NotFoundException("Ürünlerini listelemek istediğiniz kategori mevcut değildir");
             }
 
-            if (GetUserRole() == "Admin")
+            string? role = null;
+            try { role = GetUserRole(); } catch { }
+
+            if (role == "Admin")
                 products = await _productRepository.GetAllProductsIncludeDeletedAsync(categoryId);
             else
                 products = await _productRepository.GetAllProductsAsync(categoryId);

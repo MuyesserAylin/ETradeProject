@@ -12,8 +12,10 @@ namespace ETrade.Core.DTOs.Responses
         public string Name { get; set; } = null!;
         public decimal Price { get; set; }
         public int Stock { get; set; }
+        public string Description { get; set; } = string.Empty;
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }=null!;
+        public bool IsDeleted { get; set; }
 
 
     }

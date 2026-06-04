@@ -1,25 +1,29 @@
-// src/app/layout.tsx
-import { CartProvider } from '@/context/CartContext';
-import './globals.css'; // veya global.css sende hangisi varsa
+import type { Metadata } from 'next'
+import { Geist } from 'next/font/google'
+import './globals.css'
+import Providers from '@/components/Providers'
+import { Toaster } from 'sonner'
 
-export const metadata = {
-  title: 'ETrade - Premium Alışveriş',
-  description: '.NET Core & Next.js E-Commerce',
-};
+const geist = Geist({ subsets: ['latin'] })
+
+export const metadata: Metadata = {
+  title: 'ETrade',
+  description: 'Modern e-ticaret platformu',
+}
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
     <html lang="tr">
-      <body>
-        {/* Bütün uygulamayı sepet koruyucusu ile sarmalıyoruz */}
-        <CartProvider>
+      <body className={`${geist.className} bg-[#0a0a0a] text-white antialiased`}>
+        <Providers>
           {children}
-        </CartProvider>
+        </Providers>
+        <Toaster richColors position="top-right" />
       </body>
     </html>
-  );
+  )
 }

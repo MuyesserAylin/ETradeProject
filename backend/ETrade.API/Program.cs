@@ -23,23 +23,24 @@ var fullConnectionString = $"{connectionString} Password={dbPassword};";
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(fullConnectionString));
 
-// Repository ve Service kayıtlar
+// Repository ve Service kayıtları
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IProductRepository, ProductRepository>(); 
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<ICategoryRepository,CategoryRepository>();
-builder.Services.AddScoped<ICategoryService,CategoryService>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
-builder.Services.AddScoped<ICartService,CartService>();
+builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddScoped<IEmailService,MailService>();
+builder.Services.AddScoped<IEmailService, MailService>();
 
 builder.Services.AddScoped<JwtHelper>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+// CORS Politikası Tanımlama
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -49,7 +50,6 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
-
 
 // JWT ayarları
 var secretKey = builder.Configuration["JwtSettings:SecretKey"];
@@ -87,7 +87,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddControllers();
+// Controllers & JSON Naming Policy (CamelCase için)
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    });
+
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = context =>
@@ -138,22 +144,21 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-using (var scope=app.Services.CreateScope())
+// Veritabanı Seed (Admin Kullanıcı Oluşturma)
+using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-    if(!context.Users.Any(u=>u.Role=="Admin"))
+    if (!context.Users.Any(u => u.Role == "Admin"))
     {
         context.Users.Add(new ETrade.Core.Entities.User
         {
-            FullName="Admin",
+            FullName = "Admin",
             Email = builder.Configuration["AdminSettings:Email"]!,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(builder.Configuration["AdminSettings:Password"]!),
-            Role="Admin"
-            
+            Role = "Admin"
         });
         context.SaveChanges();
-
     }
 }
 
@@ -163,10 +168,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 app.UseMiddleware<GlobalExceptionMiddleware>();
-app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();
-app.UseAuthentication(); 
-app.UseAuthorization();
+
+app.UseCors("AllowFrontend");
+app.UseAuthentication();    
+app.UseAuthorization();      
+
 app.MapControllers();
 app.Run();

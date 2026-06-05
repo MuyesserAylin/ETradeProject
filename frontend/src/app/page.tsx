@@ -54,8 +54,8 @@ export default function HomePage() {
           <button
             onClick={() => setActiveCat(undefined)}
             className={`px-4 py-2 rounded-full text-sm font-medium border transition-all ${activeCat === undefined
-                ? 'bg-emerald-500 border-emerald-500 text-white'
-                : 'border-white/10 text-white/50 hover:text-white hover:border-white/30'
+              ? 'bg-emerald-500 border-emerald-500 text-white'
+              : 'border-white/10 text-white/50 hover:text-white hover:border-white/30'
               }`}
           >
             Tümü
@@ -71,8 +71,8 @@ export default function HomePage() {
                 key={cat.id}
                 onClick={() => setActiveCat(cat.id)}
                 className={`px-4 py-2 rounded-full text-sm font-medium border transition-all ${activeCat === cat.id
-                    ? 'bg-emerald-500 border-emerald-500 text-white'
-                    : 'border-white/10 text-white/50 hover:text-white hover:border-white/30'
+                  ? 'bg-emerald-500 border-emerald-500 text-white'
+                  : 'border-white/10 text-white/50 hover:text-white hover:border-white/30'
                   }`}
               >
                 {cat.name}

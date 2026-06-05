@@ -103,9 +103,8 @@ Modern, rol tabanlı bir e-ticaret platformu. ASP.NET Core Web API backend ve Ne
 ```
 ETrade/
 ├── backend/
-│   ├── ETrade.API          # Controllers, Program.cs
-│   ├── ETrade.Core         # Entities, DTOs, Services, Repositories
-│   └── ETrade.Infrastructure # DbContext, Migrations
+│   ├── ETrade.API          # Controllers, Middlewares, Migrations, Program.cs
+│   ├── ETrade.Core         # Entities, DTOs, Services, Repositories, Data, Exceptions, Mapper, Helpers
 └── frontend/
     └── src/
         ├── app/            # Next.js App Router sayfaları

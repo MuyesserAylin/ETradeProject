@@ -54,6 +54,11 @@ export default function OrdersPage() {
     if (!mounted) return null
     if (!isLoggedIn()) return null
 
+    const isCancellable = (status: any) => {
+        const s = Number(status)
+        return s === OrderStatus.Pending || s === OrderStatus.Processing
+    }
+
     const handleCancel = (id: number) => {
         cancelOrder.mutate(id, {
             onSuccess: () => toast.success('Sipariş iptal edildi.'),
@@ -113,8 +118,8 @@ export default function OrdersPage() {
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${OrderStatusColor[order.status]}`}>
-                                            {OrderStatusLabel[order.status]}
+                                        <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${OrderStatusColor[Number(order.status) as OrderStatus]}`}>
+                                            {OrderStatusLabel[Number(order.status) as OrderStatus]}
                                         </span>
                                         <span className="font-semibold text-sm">{order.totalAmount.toLocaleString('tr-TR')}₺</span>
                                         <ChevronDown size={16} className={`text-white/30 transition-transform ${openId === order.id ? 'rotate-180' : ''}`} />
@@ -126,7 +131,7 @@ export default function OrdersPage() {
                                         <OrderDetail orderId={order.id} />
                                         <div className="border-t border-white/10 pt-4 mt-4 flex items-center justify-between">
                                             <span className="font-semibold">{order.totalAmount.toLocaleString('tr-TR')}₺</span>
-                                            {order.status === OrderStatus.Pending && (
+                                            {isCancellable(order.status) && (
                                                 <button
                                                     onClick={() => handleCancel(order.id)}
                                                     disabled={cancelOrder.isPending}
